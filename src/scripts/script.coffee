@@ -8,34 +8,44 @@ draw_canvas = ->
 
   ctx = canvas.getContext "2d"
 
-  color = ["red", "blue", "green", "pink", "yellow"]
-
   random = (n) ->
-    Math.floor Math.random() * n
+    Math.random() * n
 
-  clear = ->
-    canvas.width = cw
-    canvas.height = ch
+  class Square
+    constructor: ->
+      @x = random cw
+      @y = random ch
+      @speed = 2 + random 3
+      @size = 1 + random 4
 
-  y = 0
-  l = 100
+    move: ->
+      @x = @x + @speed
+      @y = @y + @speed
+      @out_square_in()
+
+    out_square_in: ->
+      @x = cw if @x < 0
+      @x = 0 if @x > cw
+      @y = ch if @y < 0
+      @y = 0 if @y > ch
+
+  instances = []
+  for n in [0...200]
+    instances.push new Square()
 
   (mainLoop = ->
-    clear()
+    ctx.clearRect 0, 0, cw, ch
 
-    y = 0 if y > ch
+    ctx.fillStyle = "black"
+    ctx.fillRect 0, 0, cw, ch
 
-    # for i in [1..cw/15]
-    #   x = (i + 0.5) * 15
-    #   ctx.moveTo x, y
-    #   ctx.lineTo x, y + l
+    for i in [0...instances.length]
+      p = instances[i]
+      ctx.fillStyle = "white"
+      ctx.fillRect p.x, p.y, p.size, p.size
 
-    ctx.moveTo 100, y
-    ctx.lineTo 100, y + l
+      p.move()
+      # console.log p.speed
 
-    ctx.stroke()
-
-    y += 200
-
-    # setTimeout mainLoop, 1000
+    setTimeout mainLoop, 50
   )()
